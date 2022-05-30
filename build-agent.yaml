@@ -18,7 +18,8 @@ spec:
     - name: slscan
       image: shiftleft/sast-scan
       imagePullPolicy: Always
-      - cat
+      command:
+        - cat
       tty: true
     - name: maven
       image: maven:alpine
