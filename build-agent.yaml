@@ -15,6 +15,11 @@ spec:
       volumeMounts:
         - name: jenkins-docker-cfg
           mountPath: /kaniko/.docker
+    - name: slscan
+      image: shiftleft/sast-scan
+      imagePullPolicy: Always
+      - cat
+      tty: true
     - name: maven
       image: maven:alpine
       command:
