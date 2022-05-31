@@ -18,6 +18,24 @@ pipeline {
         }
       }
     }
+    stage('Image Analysis') {
+      parallel {
+        stage('Image Linting') {
+          steps {
+            container('docker-tools') {
+              sh 'dockle docker.io/lsdourado/dsodemo'
+            }
+          }
+        }
+        stage('Image Scan') {
+          steps {
+            container('docker-tools') {
+              sh 'trivy image --exit-code 1 lsdourado/dsodemo'
+            }
+          }
+        }
+      }
+    }
     stage('Static Analysis') {
       parallel {
         stage('SAST') {
