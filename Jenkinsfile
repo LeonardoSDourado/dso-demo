@@ -1,4 +1,7 @@
 pipeline {
+  environment {
+    ARGO_SERVER = '52.207.211.8:32100'
+  }
   agent {
     kubernetes {
       yamlFile 'build-agent.yaml'
@@ -30,7 +33,7 @@ pipeline {
         stage('Image Scan') {
           steps {
             container('docker-tools') {
-              sh 'trivy image --exit-code 1 lsdourado/dsodemo'
+              //sh 'trivy image --exit-code 1 lsdourado/dsodemo'
             }
           }
         }
@@ -57,7 +60,7 @@ pipeline {
             }
           }
         }
-        stage('SCA') {
+        /*stage('SCA') {
           steps {
             container('maven') {
               catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
@@ -71,8 +74,8 @@ pipeline {
               // dependencyCheckPublisher pattern: 'report.xml'
             }
           }
-        }
-        stage('OSS License Checker') {
+        }*/
+        /*stage('OSS License Checker') {
           steps {
             container('licensefinder') {
               sh 'ls -al'
@@ -84,7 +87,7 @@ pipeline {
                     '''
             }
           }
-        }
+        }*/
         stage('Generate SBOM') {
           steps {
             container('maven') {
@@ -120,9 +123,14 @@ pipeline {
     }
 
     stage('Deploy to Dev') {
+      environment {
+        AUTH_TOKEN = credentials('argocd-jenkins-deployer-token')
+      }
       steps {
-        // TODO
-        sh "echo done"
+        container('docker-tools') {
+          sh 'docker run -t schoolofdevops/argocd-cli argocd app sync dso-demo --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN'
+          sh 'docker run -t schoolofdevops/argocd-cli argocd app wait dso-demo --health --timeout 300 --insecure --server $ARGO_SERVER --auth-token $AUTH_TOKEN'
+        }
       }
     }
   }
