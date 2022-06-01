@@ -56,7 +56,7 @@ pipeline {
         stage('Unit Tests') {
           steps {
             container('maven') {
-              sh 'mvn test'
+              //sh 'mvn test'
             }
           }
         }
