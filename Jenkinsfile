@@ -1,6 +1,6 @@
 pipeline {
   environment {
-    ARGO_SERVER = 'argocd-server.svc.argocd.cluster.local:32100'
+    ARGO_SERVER = '52.207.211.8:32100'
   }
   agent {
     kubernetes {
